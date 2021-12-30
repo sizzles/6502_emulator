@@ -9,7 +9,7 @@ namespace Cpu.Instructions
     [InstructionRegister]
     public class BRK_Implied_Instruction : Instruction
     {
-        public BRK_Implied_Instruction() : base()
+        public BRK_Implied_Instruction(Cpu cpu) : base(cpu)
         {
             this.mnemonic = "BRK";
             this.hexCode = 0x00;

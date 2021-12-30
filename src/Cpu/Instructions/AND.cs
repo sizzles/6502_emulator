@@ -9,7 +9,7 @@ namespace Cpu.Instructions
     [InstructionRegister]
     public class AND_ZP_Instruction : Instruction
     {
-        public AND_ZP_Instruction() : base()
+        public AND_ZP_Instruction(Cpu cpu) : base(cpu)
         {
             this.mnemonic = "AND";
             this.hexCode = 0x25;
@@ -24,10 +24,11 @@ namespace Cpu.Instructions
         {
             //increment the PC - read the page
             cpu.IncrementPC();
-            byte operand = cpu.addressBus.ReadByte(cpu.PC);
+            byte lb = cpu.addressBus.ReadByte(cpu.PC);
+            byte m = cpu.addressBus.ReadByte((ushort)(lb));
 
             //do a bitwise and with what is in the Accumulator
-            byte result = (byte)(cpu.A & operand);
+            byte result = (byte)(cpu.A & m);
 
             //store this on the accumulator
             cpu.A = result;

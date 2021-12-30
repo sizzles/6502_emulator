@@ -9,7 +9,7 @@ namespace Cpu.Instructions
     [InstructionRegister]
     public class PLP_Implied_Instruction : Instruction
     {
-        public PLP_Implied_Instruction():base()
+        public PLP_Implied_Instruction(Cpu cpu):base(cpu)
         {
             this.mnemonic = "PLP";
             this.hexCode = 0x28;

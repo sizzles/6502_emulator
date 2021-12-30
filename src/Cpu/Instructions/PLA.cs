@@ -8,7 +8,7 @@ namespace Cpu.Instructions
 {
     public class PLA_Implied : Instruction
     {
-        public PLA_Implied():base()
+        public PLA_Implied(Cpu cpu):base(cpu)
         {
             this.mnemonic = "PLA";
             this.hexCode = 0x68;
@@ -21,6 +21,8 @@ namespace Cpu.Instructions
 
         public override void Execute(Cpu cpu)
         {
+            cpu.IncrementPC(); //fetch next op code and discard
+
             byte result = cpu.PopStack();
 
             cpu.A = result;

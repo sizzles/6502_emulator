@@ -29,11 +29,15 @@
         public AddressingMode addressingMode;
         public int instructionBytes;
         public int machineCycles;
+        public Cpu cpu;
 
-        public Instruction() { }
+        public Instruction(Cpu cpu) {
+            this.cpu = cpu;
+        }
 
-        public Instruction(string mnemonic, byte hexCode, AddressingMode addressingMode, byte instructionBytes, byte machineCycles)
+        public Instruction(Cpu cpu, string mnemonic, byte hexCode, AddressingMode addressingMode, byte instructionBytes, byte machineCycles)
         {
+            this.cpu = cpu;
             this.mnemonic = mnemonic;
             this.hexCode = hexCode;
             this.addressingMode = addressingMode;
@@ -44,5 +48,24 @@
         public virtual string Description => "Not Implemented";
         public abstract void Execute(Cpu cpu);
 
+        public virtual void HandleZeroFlag(byte result)
+        {
+            //Set zero flag
+            if (result == 0)
+            {
+                cpu.SetProcessorStatusFlag(true, StatusFlagName.Zero);
+            }
+            else
+            {
+                cpu.SetProcessorStatusFlag(false, StatusFlagName.Zero);
+            }
+        }
+
+        public virtual void HandleNegativeFlag(byte result)
+        {
+            //Set by result bit 7 --to do check this vs signed logic??
+            bool isNegative = Convert.ToBoolean((result & 0b10000000) >> 7);
+            cpu.SetProcessorStatusFlag(isNegative, StatusFlagName.Negative);
+        }
     }
 }

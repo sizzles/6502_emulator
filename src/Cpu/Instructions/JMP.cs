@@ -9,7 +9,7 @@ namespace Cpu.Instructions
     [InstructionRegister]
     public class JMP_ABS_Instruction : Instruction
     {
-        public JMP_ABS_Instruction() : base()
+        public JMP_ABS_Instruction(Cpu cpu) : base(cpu)
         {
             this.mnemonic = "JMP";
             this.hexCode = 0x4C;

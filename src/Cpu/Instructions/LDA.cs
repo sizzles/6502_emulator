@@ -10,7 +10,7 @@ namespace Cpu.Instructions
     [InstructionRegister]
     public class LDA_INDX_Instruction : Instruction
     {
-        public LDA_INDX_Instruction() : base()
+        public LDA_INDX_Instruction(Cpu cpu) : base(cpu)
         {
             this.mnemonic = "LDX";
             this.hexCode = 0xA1;

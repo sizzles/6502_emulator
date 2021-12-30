@@ -4,6 +4,8 @@ namespace Cpu.Instructionns
 {
     public abstract class ADC_Base_Instruction : Instruction
     {
+        public ADC_Base_Instruction(Cpu cpu) : base(cpu) { }
+
         public override void Execute(Cpu cpu)
         {
         }
@@ -67,7 +69,7 @@ namespace Cpu.Instructionns
     [InstructionRegister]
     public class ADC_ZP_Instruction : ADC_Base_Instruction
     {
-        public ADC_ZP_Instruction() : base()
+        public ADC_ZP_Instruction(Cpu cpu) : base(cpu)
         {
             this.mnemonic = "ADC";
             this.hexCode = 0x65;

@@ -9,7 +9,7 @@ namespace Cpu.Instructions
     [InstructionRegister]
     public class CMP_IMM : Instruction
     {
-        public CMP_IMM():base()
+        public CMP_IMM(Cpu cpu):base(cpu)
         {
             this.mnemonic = "CMP";
             this.hexCode = 0xC9;
@@ -59,7 +59,7 @@ namespace Cpu.Instructions
     [InstructionRegister]
     public class CMP_ZP : Instruction
     {
-        public CMP_ZP():base()
+        public CMP_ZP(Cpu cpu):base(cpu)
         {
             this.mnemonic = "CMP";
             this.hexCode = 0xC5;
@@ -89,20 +89,8 @@ namespace Cpu.Instructions
                 cpu.SetProcessorStatusFlag(false, StatusFlagName.Carry);
             }
 
-            //Set zero flag
-            if (result == 0)
-            {
-                cpu.SetProcessorStatusFlag(true, StatusFlagName.Zero);
-            }
-            else
-            {
-                cpu.SetProcessorStatusFlag(false, StatusFlagName.Zero);
-            }
-
-            //Set negative flag
-            //Set by result bit 7 --to do check this vs signed logic??
-            bool isNegative = Convert.ToBoolean((result & 0b10000000) >> 7);
-            cpu.SetProcessorStatusFlag(isNegative, StatusFlagName.Negative);
+            HandleZeroFlag(result);
+            HandleNegativeFlag(result);
 
             cpu.SetTimingControl(machineCycles);
             cpu.IncrementPC();

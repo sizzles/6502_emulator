@@ -15,6 +15,7 @@ namespace Cpu
     //6) http://www.6502.org/tutorials/vflag.html#2.4 -- overflow flag / addition
     //7) https://www.pagetable.com/c64ref/6502/?tab=2 -- opcodes 
     //8) https://www.middle-engine.com/blog/posts/2020/06/23/programming-the-nes-the-6502-in-detail
+    //9) https://www.nesdev.com/6502_cpu.txt
 
     public class Ram
     {
@@ -22,7 +23,8 @@ namespace Cpu
 
         public Ram()
         {
-            this.memory  = new byte[65536];
+            this.memory  = new 
+                byte[65536];
             //Init all to zeros
             for (var i = 0x0000; i <= 0xFFFF; i += 0x0001)
             {

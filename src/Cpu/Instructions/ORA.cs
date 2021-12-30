@@ -9,7 +9,7 @@ namespace Cpu.Instructions
     [InstructionRegister] 
     public class ORA_ABSY : Instruction
     {
-        public ORA_ABSY():base()
+        public ORA_ABSY(Cpu cpu):base(cpu)
         {
             this.mnemonic = "ORA";
             this.hexCode = 0x19;
@@ -27,9 +27,44 @@ namespace Cpu.Instructions
             //How many extra pages are there after that?
 
             cpu.IncrementPC(); //now on first byte of operand
+            ushort mem = (ushort)(cpu.Read16());
+            ushort memY = (ushort)(mem + cpu.Y);
 
+            byte result = (byte)(cpu.addressBus.ReadByte(memY) | cpu.A); //binary or on the accumulator
+            cpu.A = result;
 
+            //Set Zero flag if needed
+            if (cpu.A == 0)
+            {
+                cpu.SetProcessorStatusFlag(true, StatusFlagName.Zero);
+            }
+            else
+            {
+                cpu.SetProcessorStatusFlag(false, StatusFlagName.Zero);
+            }
 
+            //Set Negative flag if needed
+            if (cpu.IsByteNegative(result))
+            {
+                cpu.SetProcessorStatusFlag(true, StatusFlagName.Negative);
+            }
+            else
+            {
+                cpu.SetProcessorStatusFlag(false, StatusFlagName.Negative);
+            }
+
+            //Shift right to just compare the high bytes for these
+            if (memY >> 8 > mem >> 8)
+            {
+                cpu.SetTimingControl(machineCycles + 1); //machine cycle for the extra page now
+            }
+
+            else
+            {
+                cpu.SetTimingControl(machineCycles);
+            }
+
+            cpu.IncrementPC();
         }
     }
 }
