@@ -7,16 +7,20 @@ using System.Threading.Tasks;
 namespace Cpu.Instructions
 {
     [InstructionRegister]
-    public class JSR_ABS_Instruction : Instruction
+    public class JSR_Instruction : Instruction
     {
-        public JSR_ABS_Instruction(Cpu cpu) : base(cpu)
+        public JSR_Instruction(Cpu cpu, string mnemonic, byte hexCode, AddressingMode addressingMode, byte instructionBytes, byte machineCycles) : base(cpu, mnemonic, hexCode, addressingMode, instructionBytes, machineCycles)
         {
-            this.mnemonic = "JSR";
-            this.hexCode = 0x02;
-            this.addressingMode = AddressingMode.ABS;
-            this.instructionBytes = 3;
-            this.machineCycles = 6;
         }
+
+        //public JSR_Instruction(Cpu cpu) : base(cpu)
+        //{
+        //    this.mnemonic = "JSR";
+        //    this.hexCode = 0x02;
+        //    this.addressingMode = AddressingMode.ABS;
+        //    this.instructionBytes = 3;
+        //    this.machineCycles = 6;
+        //}
 
         public override string Description => "Jump to sub routine.";
 

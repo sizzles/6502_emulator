@@ -7,18 +7,11 @@ using System.Threading.Tasks;
 namespace Cpu.Instructions
 {
     [InstructionRegister]
-    public class BRK_Implied_Instruction : Instruction
+    public class BRK_Instruction : Instruction
     {
-        public BRK_Implied_Instruction(Cpu cpu) : base(cpu)
+        public BRK_Instruction(Cpu cpu, string mnemonic, byte hexCode, AddressingMode addressingMode, byte instructionBytes, byte machineCycles) : base(cpu, mnemonic, hexCode, addressingMode, instructionBytes, machineCycles)
         {
-            this.mnemonic = "BRK";
-            this.hexCode = 0x00;
-            this.addressingMode = AddressingMode.Implied;
-            this.instructionBytes = 1;
-            this.machineCycles = 7;
         }
-
-        //Todo - Finish this - interupt vectors etc
         public override void Execute(Cpu cpu)
         {
             cpu.IncrementPC();
@@ -37,6 +30,9 @@ namespace Cpu.Instructions
             cpu.SetProcessorStatusFlag(true, StatusFlagName.Brk); //Set break flag true and push processor status to the stack
 
             cpu.SetTimingControl(machineCycles);
+            //transfer to the interrupt vector
+            ushort brkVectorAddress = cpu.Read16(Cpu.BRK_VECTOR_LSB);
+            cpu.SetPC(brkVectorAddress);
 
         }
 

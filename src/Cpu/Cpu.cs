@@ -8,8 +8,7 @@ namespace Cpu
 {
     //References:
     //1) http://archive.6502.org/datasheets/rockwell_r650x_r651x.pdf
-    //2) http://users.telenet.be/kim1-6502/6502/proman.html#10
-    //3) http://www.6502.org/tutorials/65c816opcodes.html
+    //2) http://users.telenet.be/kim1-6502/6502/proman.html#10 --good one
     //4) http://archive.6502.org/books/mcs6500_family_hardware_manual.pdf
     //5) https://slark.me/c64-downloads/6502-addressing-modes.pdf -- addressing modes
     //6) http://www.6502.org/tutorials/vflag.html#2.4 -- overflow flag / addition
@@ -75,6 +74,8 @@ namespace Cpu
         Negative = 7
     }
 
+    public record FetchResult(byte operand, int pageCross);
+
     public class Cpu
     {
         //Registers
@@ -117,6 +118,18 @@ namespace Cpu
         public AddressBus addressBus;
         public Dictionary<Byte, Instruction> instructionMatrix;
 
+        //Interrupt Vector Locations
+        public const ushort ABORT_VECTOR_LSB = 0XFFF8;
+        //public const ushort ABORT_VECTOR_MSB = 0XFFF9;
+
+        public const ushort COP_VECTOR_LSB = 0XFFF4;
+        //public const ushort COP_VECTOR_MSB = 0XFFF5;
+
+        public const ushort BRK_VECTOR_LSB = 0XFFFE;
+        //public const ushort BRK_VECTOR_MSB = 0XFFFF;
+
+
+
         #region ProcessorStatusFlags
         public void SetZeroFlagIfRequired(byte result)
         {
@@ -124,6 +137,10 @@ namespace Cpu
             if (result == 0)
             {
                 SetProcessorStatusFlag(true, StatusFlagName.Zero);
+            }
+            else
+            {
+                SetProcessorStatusFlag(false, StatusFlagName.Zero);
             }
         }
 
@@ -254,6 +271,19 @@ namespace Cpu
             //SetInstruction(new ADC_ZP_Instruction()); //
         }
 
+        public ushort Read16(ushort address)
+        {
+            byte pcl = addressBus.ReadByte(address);
+            ushort pchAddress = (ushort)(address + Convert.ToUInt16(1));
+            byte pch = addressBus.ReadByte(pchAddress);
+
+            ushort result = pch;
+            result = (ushort)(result << 8);
+            result += pcl;
+
+            return result;
+        }
+
         public ushort Read16()
         {
             //Based on Little Endian ordering
@@ -336,6 +366,15 @@ namespace Cpu
             //Todo do we need reset procedure - how is the stack pointer initialised??
         }
 
+        public void Reset()
+        {
+            //Interupt disable flag is set
+            SetProcessorStatusFlag(true, StatusFlagName.IRQDisable);
+            //Load program vector locations
+            ushort pc = Read16(0xFFFC);
+            this.SetPC(pc);
+        }
+
         public void Tick()
         {
             //Get next instruction from location at the program counter -- expecting this to have been set by the program counter I guess
@@ -377,5 +416,81 @@ namespace Cpu
             bool isByteNegative = Convert.ToBoolean((result & 0b10000000) >> 7);
             return isByteNegative;
         }
+
+        
+
+        public FetchResult Fetch(AddressingMode addressingMode)
+        {
+            //Fetches based on the addressing mode
+            //Based on having read the first operand as the opcode - so assuming the PC is set at this point still
+
+            byte operand = 0;
+            int pageCross = 0;
+            ushort address = 0;
+            byte lb = 0;
+            byte hb = 0;
+
+            IncrementPC();
+
+            switch (addressingMode)
+            {
+                case AddressingMode.Implied: //1 byte instruction
+                    operand = addressBus.ReadByte(PC);
+                    break;
+                case AddressingMode.Accum: //1 byte instruction
+                    break;
+                case AddressingMode.IMM: //2 byte instruction
+                    operand = addressBus.ReadByte(PC);
+                    break;
+                case AddressingMode.ABS: //3 byte instruction
+                    address = Read16();
+                    operand = addressBus.ReadByte(address);
+                    break;
+                case AddressingMode.ABSX:  //3 byte instruction
+                    address = Read16();
+                    ushort addressX = (ushort)(address + (ushort)X);
+                    operand = addressBus.ReadByte(addressX);
+                    if (addressX >> 7 > address >> 8)
+                        pageCross = 1;
+                    break;
+                case AddressingMode.ABSY: //3 byte instruction
+                    address = Read16();
+                    ushort addressY = (ushort)(address + (ushort)X);
+                    operand = addressBus.ReadByte(addressY);
+                    if (addressY >> 7 > address >> 8)
+                        pageCross = 1;
+                    break;
+                case AddressingMode.ZP: //2 byte instruction
+                    address = (ushort)addressBus.ReadByte(PC);
+                    operand = addressBus.ReadByte(address);
+                    break;
+                case AddressingMode.ZPX: //2 byte instruction
+                    address = (ushort)((ushort)addressBus.ReadByte(PC) + (ushort)X);
+                    operand = addressBus.ReadByte(address);
+                    break;
+                case AddressingMode.ZPY: //2 byte instruction
+                    address = (ushort)((ushort)addressBus.ReadByte(PC) + (ushort)Y);
+                    operand = addressBus.ReadByte(address);
+                    break;
+                case AddressingMode.INDX:
+                    byte indx = (byte)(addressBus.ReadByte(PC) + X);
+                    lb = addressBus.ReadByte(indx);
+                    hb = addressBus.ReadByte((ushort)(indx+1));
+                    operand = addressBus.ReadByte((ushort)((hb << 8) + lb));
+                    break;
+                case AddressingMode.INDY:
+                    byte indy = (byte)(addressBus.ReadByte(PC) + Y);
+                    lb = addressBus.ReadByte(indy);
+                    hb = addressBus.ReadByte((ushort)(indy + 1));
+                    operand = addressBus.ReadByte((ushort)((hb << 8) + lb));
+                    break;
+                case AddressingMode.Relative:
+                    operand = addressBus.ReadByte(PC);
+                    break;
+            }
+
+            return new FetchResult(operand, pageCross);
+        }
     }
 }
+

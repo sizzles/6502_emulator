@@ -7,15 +7,19 @@ using System.Threading.Tasks;
 namespace Cpu.Instructions
 {
     [InstructionRegister]
-    public class RTS_Implied : Instruction
+    public class RTS : Instruction
     {
-        public  RTS_Implied(Cpu cpu):base(cpu)
+        public RTS(Cpu cpu, string mnemonic, byte hexCode, AddressingMode addressingMode, byte instructionBytes, byte machineCycles) : base(cpu, mnemonic, hexCode, addressingMode, instructionBytes, machineCycles)
         {
-            this.mnemonic = "RTS";
-            this.hexCode = 0x60;
-            this.instructionBytes = 1;
-            this.machineCycles = 6;
         }
+
+        //public  RTS(Cpu cpu):base(cpu)
+        //{
+        //    this.mnemonic = "RTS";
+        //    this.hexCode = 0x60;
+        //    this.instructionBytes = 1;
+        //    this.machineCycles = 6;
+        //}
 
         public override string Description => "loads the program count low and program count high from the stack into the program counter and increments the program counter so that it points to the instruction following the JSR. The stack pointer is adjusted by incrementing it twice.";
 

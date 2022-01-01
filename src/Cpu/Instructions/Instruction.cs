@@ -47,25 +47,5 @@
 
         public virtual string Description => "Not Implemented";
         public abstract void Execute(Cpu cpu);
-
-        public virtual void HandleZeroFlag(byte result)
-        {
-            //Set zero flag
-            if (result == 0)
-            {
-                cpu.SetProcessorStatusFlag(true, StatusFlagName.Zero);
-            }
-            else
-            {
-                cpu.SetProcessorStatusFlag(false, StatusFlagName.Zero);
-            }
-        }
-
-        public virtual void HandleNegativeFlag(byte result)
-        {
-            //Set by result bit 7 --to do check this vs signed logic??
-            bool isNegative = Convert.ToBoolean((result & 0b10000000) >> 7);
-            cpu.SetProcessorStatusFlag(isNegative, StatusFlagName.Negative);
-        }
     }
 }

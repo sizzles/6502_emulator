@@ -2,17 +2,16 @@
 
 namespace Cpu.Instructionns
 {
-    public abstract class ADC_Base_Instruction : Instruction
-    {
-        public ADC_Base_Instruction(Cpu cpu) : base(cpu) { }
 
-        public override void Execute(Cpu cpu)
+    public class ADC_Instruction : Instruction
+    {
+        public ADC_Instruction(Cpu cpu, string mnemonic, byte hexCode, AddressingMode addressingMode, byte instructionBytes, byte machineCycles) : base(cpu, mnemonic, hexCode, addressingMode, instructionBytes, machineCycles)
         {
         }
 
-        //Base class that does the common elements for ADC instructions
-        //As there are multiple addressing modes 
-        protected void DoADCCalc(Cpu cpu, byte mem)
+        public override string Description => "Adds the value of memory and carry from the previous operation to the value of the accumulator and stores result in the accumulator.";
+
+        private void DoADCCalc(Cpu cpu, byte mem)
         {
             //Get carry flag
             byte carry = Convert.ToByte(cpu.GetProcessorStatusFlag(StatusFlagName.Carry));
@@ -64,35 +63,56 @@ namespace Cpu.Instructionns
                 cpu.SetProcessorStatusFlag(false, StatusFlagName.Overflow);
             }
         }
-    }
-
-    [InstructionRegister]
-    public class ADC_ZP_Instruction : ADC_Base_Instruction
-    {
-        public ADC_ZP_Instruction(Cpu cpu) : base(cpu)
-        {
-            this.mnemonic = "ADC";
-            this.hexCode = 0x65;
-            this.addressingMode = AddressingMode.ZP;
-            this.instructionBytes = 2;
-            this.machineCycles = 3;
-        }
-
-        public override string Description => "adds the value of memory and carry from the previous operation to the value of the accumulator and stores result in the accumulator.";
 
         public override void Execute(Cpu cpu)
         {
-            cpu.IncrementPC();
-            byte lb = cpu.addressBus.ReadByte(cpu.PC);
-            ushort address = (ushort)(lb);
-
-            //Read from memory
-            byte mem = cpu.addressBus.ReadByte(address);
-
-            base.DoADCCalc(cpu, mem);
-
-            cpu.SetTimingControl(machineCycles);
+            FetchResult fr = cpu.Fetch(this.addressingMode);
+            this.DoADCCalc(this.cpu, fr.operand);
+            cpu.SetTimingControl(machineCycles + fr.pageCross);
             cpu.IncrementPC();
         }
     }
+
+    //public abstract class ADC_Base_Instruction : Instruction
+    //{
+    //    public ADC_Base_Instruction(Cpu cpu) : base(cpu) { }
+
+    //    public override void Execute(Cpu cpu)
+    //    {
+    //    }
+
+    //    //Base class that does the common elements for ADC instructions
+    //    //As there are multiple addressing modes 
+        
+    //}
+
+    //[InstructionRegister]
+    //public class ADC_ZP_Instruction : ADC_Base_Instruction
+    //{
+    //    public ADC_ZP_Instruction(Cpu cpu) : base(cpu)
+    //    {
+    //        this.mnemonic = "ADC";
+    //        this.hexCode = 0x65;
+    //        this.addressingMode = AddressingMode.ZP;
+    //        this.instructionBytes = 2;
+    //        this.machineCycles = 3;
+    //    }
+
+    //    public override string Description => "Adds the value of memory and carry from the previous operation to the value of the accumulator and stores result in the accumulator.";
+
+    //    public override void Execute(Cpu cpu)
+    //    {
+    //        cpu.IncrementPC();
+    //        byte lb = cpu.addressBus.ReadByte(cpu.PC);
+    //        ushort address = (ushort)(lb);
+
+    //        //Read from memory
+    //        byte mem = cpu.addressBus.ReadByte(address);
+
+    //        base.DoADCCalc(cpu, mem);
+
+    //        cpu.SetTimingControl(machineCycles);
+    //        cpu.IncrementPC();
+    //    }
+    //}
 }
