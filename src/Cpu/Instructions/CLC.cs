@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Cpu.Instructions
 {
-    public class CLC : Instruction
+    public class CLC_Instruction : Instruction
     {
-        public CLC(Cpu cpu, string mnemonic, byte hexCode, AddressingMode addressingMode, byte instructionBytes, byte machineCycles) : base(cpu, mnemonic, hexCode, addressingMode, instructionBytes, machineCycles)
+        public CLC_Instruction(Cpu cpu, string mnemonic, byte hexCode, AddressingMode addressingMode, byte instructionBytes, byte machineCycles) : base(cpu, mnemonic, hexCode, addressingMode, instructionBytes, machineCycles)
         {
         }
 

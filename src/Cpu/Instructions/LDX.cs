@@ -8,13 +8,8 @@ namespace Cpu.Instructions
 {
     public class LDX_Instruction : Instruction
     {
-        public LDX_Instruction(Cpu cpu, string mnemonic, byte hexCode, AddressingMode addressingMode, int instructionBytes, int machineCycles) : base(cpu)
+        public LDX_Instruction(Cpu cpu, string mnemonic, byte hexCode, AddressingMode addressingMode, byte instructionBytes, byte machineCycles) : base(cpu, mnemonic, hexCode, addressingMode, instructionBytes, machineCycles)
         {
-            this.mnemonic = mnemonic;
-            this.hexCode = hexCode;
-            this.addressingMode = addressingMode;
-            this.instructionBytes = instructionBytes;
-            this.machineCycles = machineCycles;
         }
         public override void Execute(Cpu cpu)
         {

@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Cpu.Instructions
 {
-    public class CMP : Instruction
+    public class CMP_Instruction : Instruction
     {
-        public CMP(Cpu cpu, string mnemonic, byte hexCode, AddressingMode addressingMode, byte instructionBytes, byte machineCycles) : base(cpu, mnemonic, hexCode, addressingMode, instructionBytes, machineCycles)
+        public CMP_Instruction(Cpu cpu, string mnemonic, byte hexCode, AddressingMode addressingMode, byte instructionBytes, byte machineCycles) : base(cpu, mnemonic, hexCode, addressingMode, instructionBytes, machineCycles)
         {
         }
 

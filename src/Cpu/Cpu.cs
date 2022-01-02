@@ -74,7 +74,7 @@ namespace Cpu
         Negative = 7
     }
 
-    public record FetchResult(byte operand, int pageCross);
+    public record FetchResult(byte operand, int pageCross, ushort address);
 
     public class Cpu
     {
@@ -435,11 +435,14 @@ namespace Cpu
             switch (addressingMode)
             {
                 case AddressingMode.Implied: //1 byte instruction
+                    address = PC;
                     operand = addressBus.ReadByte(PC);
                     break;
                 case AddressingMode.Accum: //1 byte instruction
+                    operand = A;
                     break;
                 case AddressingMode.IMM: //2 byte instruction
+                    address = PC;
                     operand = addressBus.ReadByte(PC);
                     break;
                 case AddressingMode.ABS: //3 byte instruction
@@ -448,17 +451,17 @@ namespace Cpu
                     break;
                 case AddressingMode.ABSX:  //3 byte instruction
                     address = Read16();
-                    ushort addressX = (ushort)(address + (ushort)X);
-                    operand = addressBus.ReadByte(addressX);
-                    if (addressX >> 7 > address >> 8)
+                    if ((ushort)(address + (ushort)X) >> 7 > address >> 8)
                         pageCross = 1;
+                    address = (ushort)(address + (ushort)X);
+                    operand = addressBus.ReadByte(address);
                     break;
                 case AddressingMode.ABSY: //3 byte instruction
                     address = Read16();
-                    ushort addressY = (ushort)(address + (ushort)X);
-                    operand = addressBus.ReadByte(addressY);
-                    if (addressY >> 7 > address >> 8)
+                    if ((ushort)(address + (ushort)Y) >> 7 > address >> 8)
                         pageCross = 1;
+                    address = (ushort)(address + (ushort)Y);
+                    operand = addressBus.ReadByte(address);
                     break;
                 case AddressingMode.ZP: //2 byte instruction
                     address = (ushort)addressBus.ReadByte(PC);
@@ -476,20 +479,23 @@ namespace Cpu
                     byte indx = (byte)(addressBus.ReadByte(PC) + X);
                     lb = addressBus.ReadByte(indx);
                     hb = addressBus.ReadByte((ushort)(indx+1));
-                    operand = addressBus.ReadByte((ushort)((hb << 8) + lb));
+                    address = (ushort)((hb << 8) + lb);
+                    operand = addressBus.ReadByte(address);
                     break;
                 case AddressingMode.INDY:
                     byte indy = (byte)(addressBus.ReadByte(PC) + Y);
                     lb = addressBus.ReadByte(indy);
                     hb = addressBus.ReadByte((ushort)(indy + 1));
-                    operand = addressBus.ReadByte((ushort)((hb << 8) + lb));
+                    address = (ushort)((hb << 8) + lb);
+                    operand = addressBus.ReadByte(address);
                     break;
                 case AddressingMode.Relative:
+                    address = PC;
                     operand = addressBus.ReadByte(PC);
                     break;
             }
 
-            return new FetchResult(operand, pageCross);
+            return new FetchResult(operand, pageCross, address);
         }
     }
 }
