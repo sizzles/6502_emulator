@@ -16,7 +16,6 @@ namespace Cpu.Instructions
 
         public override void Execute(Cpu cpu)
         {
-            cpu.IncrementPC(); //don't fetch as this is always implied mode
             cpu.SetTimingControl(machineCycles);
             cpu.IncrementPC();
         }

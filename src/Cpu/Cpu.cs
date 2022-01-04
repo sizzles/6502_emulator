@@ -430,26 +430,30 @@ namespace Cpu
             byte lb = 0;
             byte hb = 0;
 
-            IncrementPC();
 
             switch (addressingMode)
             {
                 case AddressingMode.Implied: //1 byte instruction
+                    //IncrementPC();
                     address = PC;
                     operand = addressBus.ReadByte(PC);
                     break;
                 case AddressingMode.Accum: //1 byte instruction
+                    //IncrementPC();
                     operand = A;
                     break;
                 case AddressingMode.IMM: //2 byte instruction
+                    IncrementPC();
                     address = PC;
                     operand = addressBus.ReadByte(PC);
                     break;
                 case AddressingMode.ABS: //3 byte instruction
+                    IncrementPC();
                     address = Read16();
                     operand = addressBus.ReadByte(address);
                     break;
                 case AddressingMode.ABSX:  //3 byte instruction
+                    IncrementPC();
                     address = Read16();
                     if ((ushort)(address + (ushort)X) >> 7 > address >> 8)
                         pageCross = 1;
@@ -457,6 +461,7 @@ namespace Cpu
                     operand = addressBus.ReadByte(address);
                     break;
                 case AddressingMode.ABSY: //3 byte instruction
+                    IncrementPC();
                     address = Read16();
                     if ((ushort)(address + (ushort)Y) >> 7 > address >> 8)
                         pageCross = 1;
@@ -464,18 +469,22 @@ namespace Cpu
                     operand = addressBus.ReadByte(address);
                     break;
                 case AddressingMode.ZP: //2 byte instruction
+                    IncrementPC();
                     address = (ushort)addressBus.ReadByte(PC);
                     operand = addressBus.ReadByte(address);
                     break;
                 case AddressingMode.ZPX: //2 byte instruction
+                    IncrementPC();
                     address = (ushort)((ushort)addressBus.ReadByte(PC) + (ushort)X);
                     operand = addressBus.ReadByte(address);
                     break;
                 case AddressingMode.ZPY: //2 byte instruction
+                    IncrementPC();
                     address = (ushort)((ushort)addressBus.ReadByte(PC) + (ushort)Y);
                     operand = addressBus.ReadByte(address);
                     break;
                 case AddressingMode.INDX:
+                    IncrementPC();
                     byte indx = (byte)(addressBus.ReadByte(PC) + X);
                     lb = addressBus.ReadByte(indx);
                     hb = addressBus.ReadByte((ushort)(indx+1));
@@ -483,6 +492,7 @@ namespace Cpu
                     operand = addressBus.ReadByte(address);
                     break;
                 case AddressingMode.INDY:
+                    IncrementPC();
                     byte indy = (byte)(addressBus.ReadByte(PC) + Y);
                     lb = addressBus.ReadByte(indy);
                     hb = addressBus.ReadByte((ushort)(indy + 1));
@@ -490,6 +500,7 @@ namespace Cpu
                     operand = addressBus.ReadByte(address);
                     break;
                 case AddressingMode.Relative:
+                    IncrementPC();
                     address = PC;
                     operand = addressBus.ReadByte(PC);
                     break;

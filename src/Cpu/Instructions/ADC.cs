@@ -1,6 +1,6 @@
 ﻿using Cpu.Instructions;
 
-namespace Cpu.Instructionns
+namespace Cpu.Instructions
 {
 
     public class ADC_Instruction : Instruction
@@ -20,12 +20,7 @@ namespace Cpu.Instructionns
             byte a = cpu.A;
 
             ushort result = (ushort)(mem + a + carry); //eg 255 + 255 + 1 is the maximum = 511 = a 9 byte number - so we use a 16 bit number to hold it
-
-            //Set Zero flag
-            if (result == 0)
-            {
-                cpu.SetProcessorStatusFlag(true, StatusFlagName.Zero);
-            }
+       
 
             //Decimal Mode - not really planning to implement this to be honest...as the NES doesnt use it
             if (cpu.GetProcessorStatusFlag(StatusFlagName.DecimalMode))
@@ -50,6 +45,9 @@ namespace Cpu.Instructionns
             byte accumulatorResult = (byte)(result & 0b0000000011111111); //do a binary and 
             cpu.A = accumulatorResult;
 
+            //Set zero flag
+            cpu.SetZeroFlagIfRequired(accumulatorResult);
+
             //Cacluate result if the number was signed - to set the overflow tags
             short resultSigned = (sbyte)((sbyte)(mem) + (sbyte)(a) + carry);
 
@@ -62,6 +60,9 @@ namespace Cpu.Instructionns
             {
                 cpu.SetProcessorStatusFlag(false, StatusFlagName.Overflow);
             }
+
+            //Negative flag
+            cpu.SetNegativeFlagIfRequired(accumulatorResult);
         }
 
         public override void Execute(Cpu cpu)

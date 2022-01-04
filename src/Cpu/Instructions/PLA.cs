@@ -17,7 +17,7 @@ namespace Cpu.Instructions
 
         public override void Execute(Cpu cpu)
         { 
-            cpu.IncrementPC(); //fetch next op code and discard
+            //cpu.IncrementPC(); //fetch next op code and discard
 
             byte result = cpu.PopStack();
 

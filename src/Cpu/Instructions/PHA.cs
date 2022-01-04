@@ -11,17 +11,12 @@ namespace Cpu.Instructions
     {
         public PHA_Instruction(Cpu cpu, string mnemonic, byte hexCode, AddressingMode addressingMode, byte instructionBytes, byte machineCycles) : base(cpu, mnemonic, hexCode, addressingMode, instructionBytes, machineCycles)
         {
-            //this.mnemonic = "PHA";
-            //this.hexCode = 0x48;
-            //this.addressingMode = AddressingMode.Implied;
-            //this.instructionBytes = 1;
-            //this.machineCycles = 3;
         }
 
         public override string Description => "Transfers current accumulator value to the stack.";
         public override void Execute(Cpu cpu)
         {
-            cpu.IncrementPC(); //fetch opcode and discard
+            //cpu.IncrementPC(); //fetch opcode and discard
             cpu.PushStack(cpu.A);
             cpu.SetTimingControl(machineCycles);
             cpu.IncrementPC();

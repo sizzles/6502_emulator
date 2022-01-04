@@ -19,11 +19,13 @@ namespace Cpu.Instructions
             FetchResult fr = cpu.Fetch(this.addressingMode);
             byte operand = fr.operand;
 
+            byte oldCarry = Convert.ToByte(cpu.GetProcessorStatusFlag(StatusFlagName.Carry));
+
             byte result = (byte)(operand << 1);
-            byte inputCarry = (byte)(operand & 0b00000001);
 
-            result += (byte)inputCarry; // input carry being stored in bit 0
+            result += (byte)oldCarry; // input carry being stored in bit 0
 
+      
             //input bit 7 stored in the carry flags.
             bool carryFlag = Convert.ToBoolean((byte)(operand & 0b10000000) >> 7);
             cpu.SetProcessorStatusFlag(carryFlag, StatusFlagName.Carry);

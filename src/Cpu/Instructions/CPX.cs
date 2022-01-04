@@ -6,21 +6,20 @@ using System.Threading.Tasks;
 
 namespace Cpu.Instructions
 {
-    public class CMP_Instruction : Instruction
+    public class CPX_Instruction : Instruction
     {
-        public CMP_Instruction(Cpu cpu, string mnemonic, byte hexCode, AddressingMode addressingMode, byte instructionBytes, byte machineCycles) : base(cpu, mnemonic, hexCode, addressingMode, instructionBytes, machineCycles)
+        public CPX_Instruction(Cpu cpu, string mnemonic, byte hexCode, AddressingMode addressingMode, byte instructionBytes, byte machineCycles) : base(cpu, mnemonic, hexCode, addressingMode, instructionBytes, machineCycles)
         {
         }
 
-        public override string Description => "Subtracts the contents of memory from the contents of the accumulator.";
+        public override string Description => "subtracts the value of the addressed memory location from the content of index register X"; 
 
         public override void Execute(Cpu cpu)
         {
             FetchResult fr = cpu.Fetch(this.addressingMode);
-            byte result = (byte)(cpu.A - fr.operand);
+            var result = (byte)(cpu.X - fr.operand);
 
-            //Set carry flag
-            if (fr.operand <= cpu.A)
+            if (cpu.X >= fr.operand)
             {
                 cpu.SetProcessorStatusFlag(true, StatusFlagName.Carry);
             }
@@ -33,6 +32,7 @@ namespace Cpu.Instructions
             cpu.SetNegativeFlagIfRequired(result);
             cpu.SetTimingControl(machineCycles + fr.pageCross);
             cpu.IncrementPC();
+
         }
     }
 }
