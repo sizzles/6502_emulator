@@ -261,14 +261,35 @@ namespace Cpu
 
             Console.WriteLine($"Registered {instructionsRegistered} instructions");
 
-            ////Basic instruction set to start with - LDY
-            //SetInstruction(new LDY_IMM_Instruction()); //Finish cycles?
-            //SetInstruction(new JMP_ABS_Instruction()); //Finish cycles?
-            //SetInstruction(new LDA_INDX_Instruction());//Finish cycles?
-            //SetInstruction(new LDY_IMM_Instruction());//Finish cycles?
-            //SetInstruction(new AND_ZP_Instruction());//Finish cycles?
-            //SetInstruction(new BRK_Implied_Instruction()); //Todo Finish this!
-            //SetInstruction(new ADC_ZP_Instruction()); //
+            Instruction[] instructions = new Instruction[256];
+
+            //Codes from: https://www.pagetable.com/c64ref/6502/?tab=2#BCS
+
+            instructions[0x69] = new ADC_Instruction(this, "ADC", 0x69, AddressingMode.IMM, 2, 2);
+            instructions[0x6D] = new ADC_Instruction(this, "ADC", 0x6D, AddressingMode.ABS, 3, 4);
+            instructions[0x7D] = new ADC_Instruction(this, "ADC", 0x7D, AddressingMode.ABSX, 3, 4);
+            instructions[0x79] = new ADC_Instruction(this, "ADC", 0x79, AddressingMode.ABSY, 3, 4);
+            instructions[0x65] = new ADC_Instruction(this, "ADC", 0x65, AddressingMode.ZP, 2,3);
+            instructions[0x75] = new ADC_Instruction(this, "ADC", 0x75, AddressingMode.ZPX, 2, 4);
+            instructions[0x61] = new ADC_Instruction(this, "ADC", 0x61, AddressingMode.INDX, 2, 6);
+            instructions[0x71] = new ADC_Instruction(this, "ADC", 0x71, AddressingMode.INDY, 2, 5);
+
+            instructions[0x29] = new AND_Instruction(this, "AND", 0x29, AddressingMode.IMM, 2, 2);
+            instructions[0x2D] = new AND_Instruction(this, "AND", 0x2D, AddressingMode.ABS, 3, 4);
+            instructions[0x3D] = new AND_Instruction(this, "AND", 0x3D, AddressingMode.ABSX, 3, 4);
+            instructions[0x39] = new AND_Instruction(this, "AND", 0x39, AddressingMode.ABSY, 3, 4);
+            instructions[0x25] = new AND_Instruction(this, "AND", 0x25, AddressingMode.ZP, 2, 3);
+            instructions[0x35] = new AND_Instruction(this, "AND", 0x35, AddressingMode.ZPX, 2, 4);
+            instructions[0x21] = new AND_Instruction(this, "AND", 0x21, AddressingMode.INDX, 2, 6);
+            instructions[0x31] = new AND_Instruction(this, "AND", 0x31, AddressingMode.INDY, 2, 5);
+
+            instructions[0x0A] = new ASL_Instruction(this, "ASL", 0x0A, AddressingMode.Accum, 1, 2);
+            instructions[0x0E] = new ASL_Instruction(this, "ASL", 0x0E, AddressingMode.ABS, 3, 6);
+            instructions[0x1E] = new ASL_Instruction(this, "ASL", 0x1E, AddressingMode.ABSX, 3, 7);
+            instructions[0x06] = new ASL_Instruction(this, "ASL", 0x06, AddressingMode.ZP, 2, 5);
+            instructions[0x16] = new ASL_Instruction(this, "ASL", 0x16, AddressingMode.ZPX, 2, 6);
+
+
         }
 
         public ushort Read16(ushort address)
