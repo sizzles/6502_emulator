@@ -1,5 +1,4 @@
-﻿using Cpu.Instructionns;
-using Cpu.Instructions;
+﻿using Cpu.Instructions;
 using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
@@ -289,6 +288,186 @@ namespace Cpu
             instructions[0x06] = new ASL_Instruction(this, "ASL", 0x06, AddressingMode.ZP, 2, 5);
             instructions[0x16] = new ASL_Instruction(this, "ASL", 0x16, AddressingMode.ZPX, 2, 6);
 
+            instructions[0x90] = new BCC_Instruction(this, "BCC", 0x90, AddressingMode.Relative, 2, 2);
+
+            instructions[0xB0] = new BCS_Instruction(this, "BCS", 0xB0, AddressingMode.Relative, 2, 2);
+
+            instructions[0xF0] = new BEQ_Instruction(this, "BEQ", 0xF0, AddressingMode.Relative, 2, 2);
+
+            instructions[0x2C] = new BIT_Instruction(this, "BIT", 0x2C, AddressingMode.ABS, 3, 4);
+            instructions[0x24] = new BIT_Instruction(this, "BIT", 0x24, AddressingMode.ZP, 2, 3);
+
+            instructions[0x30] = new BMI_Instruction(this, "BMI", 0x30, AddressingMode.Relative, 2, 2);
+
+            instructions[0xD0] = new BNE_Instruction(this, "BNE", 0xD0, AddressingMode.Relative, 2, 2);
+
+            instructions[0x10] = new BPL_Instruction(this, "BPL", 0x10, AddressingMode.Relative, 2, 2);
+
+            instructions[0x00] = new BRK_Instruction(this, "BRK", 0x00, AddressingMode.Implied, 1, 7);
+
+            instructions[0x50] = new BVC_Instruction(this, "BVC", 0x50, AddressingMode.Relative, 2, 2);
+
+            instructions[0x70] = new BVS_Instruction(this, "BVS", 0x70, AddressingMode.Relative, 2, 2);
+
+            instructions[0x18] = new CLC_Instruction(this, "CLC", 0x18, AddressingMode.Implied, 1, 2);
+
+            instructions[0x58] = new CLI_Instruction(this, "CLI", 0x58, AddressingMode.Implied, 1, 2);
+
+            instructions[0xB8] = new CLV_Instruction(this, "CLV", 0xB8, AddressingMode.Implied, 1, 2);
+
+            instructions[0xC9] = new CMP_Instruction(this, "CMP", 0xC9, AddressingMode.IMM, 2, 2);
+            instructions[0xCD] = new CMP_Instruction(this, "CMP", 0xCD, AddressingMode.ABS, 3, 4);
+            instructions[0xDD] = new CMP_Instruction(this, "CMP", 0xDD, AddressingMode.ABSX, 3, 4);
+            instructions[0xD9] = new CMP_Instruction(this, "CMP", 0xD9, AddressingMode.ABSY, 3, 4);
+            instructions[0xC5] = new CMP_Instruction(this, "CMP", 0xC5, AddressingMode.ZP, 3, 4);
+            instructions[0xD5] = new CMP_Instruction(this, "CMP", 0xD5, AddressingMode.ZPX, 3, 4);
+            instructions[0xC1] = new CMP_Instruction(this, "CMP", 0xC1, AddressingMode.INDX, 3, 4);
+            instructions[0xD1] = new CMP_Instruction(this, "CMP", 0xD1, AddressingMode.INDY, 3, 4);
+
+            instructions[0xE0] = new CPX_Instruction(this, "CPX", 0xE0, AddressingMode.IMM, 2, 2);
+            instructions[0xEC] = new CPX_Instruction(this, "CPX", 0xEC, AddressingMode.ABS, 3, 4);
+            instructions[0xE4] = new CPX_Instruction(this, "CPX", 0xE4, AddressingMode.ZP, 2, 3);
+
+            instructions[0xC0] = new CPY_Instruction(this, "CPY", 0xC0, AddressingMode.IMM, 2, 2);
+            instructions[0xCC] = new CPY_Instruction(this, "CPY", 0xCC, AddressingMode.ABS, 3, 4);
+            instructions[0xC4] = new CPY_Instruction(this, "CPY", 0xC4, AddressingMode.ZP, 2, 3);
+
+            instructions[0xCE] = new DEC_Instruction(this, "DEC", 0xCE, AddressingMode.ABS, 3, 6);
+            instructions[0xDE] = new DEC_Instruction(this, "DEC", 0xDE, AddressingMode.ABSX, 3, 7);
+            instructions[0xC6] = new DEC_Instruction(this, "DEC", 0xC6, AddressingMode.ZP, 2, 5);
+            instructions[0xD6] = new DEC_Instruction(this, "DEC", 0xD6, AddressingMode.ZPX, 2, 6);
+
+            instructions[0xCA] = new DEX_Instruction(this, "DEX", 0xCA, AddressingMode.Implied, 1, 2);
+
+            instructions[0x88] = new DEY_Instruction(this, "DEY", 0x88, AddressingMode.Implied, 1, 2);
+
+            instructions[0x49] = new EOR_Instruction(this, "EOR", 0x49, AddressingMode.IMM, 2, 2);
+            instructions[0x4D] = new EOR_Instruction(this, "EOR", 0x4D, AddressingMode.ABS, 3, 4);
+            instructions[0x5D] = new EOR_Instruction(this, "EOR", 0x5D, AddressingMode.ABSX, 3, 4);
+            instructions[0x59] = new EOR_Instruction(this, "EOR", 0x59, AddressingMode.ABSY, 3, 4);
+            instructions[0x45] = new EOR_Instruction(this, "EOR", 0x45, AddressingMode.ZP, 2, 3);
+            instructions[0x55] = new EOR_Instruction(this, "EOR", 0x55, AddressingMode.ZPX, 2, 4);
+            instructions[0x41] = new EOR_Instruction(this, "EOR", 0x41, AddressingMode.INDX, 2,6);
+            instructions[0x51] = new EOR_Instruction(this, "EOR", 0x51, AddressingMode.INDY, 2, 5);
+
+            instructions[0xEE] = new INC_Instruction(this, "INC", 0xEE, AddressingMode.ABS, 3, 6);
+            instructions[0xFE] = new INC_Instruction(this, "INC", 0xFE, AddressingMode.ABSX, 3, 7);
+            instructions[0xE6] = new INC_Instruction(this, "INC", 0xE6, AddressingMode.ZP, 2, 5);
+            instructions[0xF6] = new INC_Instruction(this, "INC", 0xF6, AddressingMode.ZPX, 2, 6);
+
+            instructions[0xE8] = new INX_Instruction(this, "INX", 0xE8, AddressingMode.Implied, 1, 2);
+            
+            instructions[0xC8] = new INY_Instruction(this, "INY", 0xC8, AddressingMode.Implied, 1, 2);
+
+            instructions[0x4C] = new JMP_Instruction(this, "JMP", 0x4C, AddressingMode.ABS, 3, 3);
+            instructions[0x6C] = new JMP_Instruction(this, "JMP", 0x6C, AddressingMode.Indirect, 3, 5);
+
+            instructions[0x20] = new JSR_Instruction(this, "JSR", 0x20, AddressingMode.ABS, 3, 6);
+
+            instructions[0xA9] = new LDA_Instruction(this, "LDA", 0xA9, AddressingMode.IMM, 2, 2);
+            instructions[0xAD] = new LDA_Instruction(this, "LDA", 0xAD, AddressingMode.ABS, 3, 4);
+            instructions[0xBD] = new LDA_Instruction(this, "LDA", 0xBD, AddressingMode.ABSX, 3, 4);
+            instructions[0xB9] = new LDA_Instruction(this, "LDA", 0xB9, AddressingMode.ABSY, 3, 4);
+            instructions[0xA5] = new LDA_Instruction(this, "LDA", 0xA5, AddressingMode.ZP, 2, 3);
+            instructions[0xB5] = new LDA_Instruction(this, "LDA", 0xB5, AddressingMode.ZPX, 2, 4);
+            instructions[0xA1] = new LDA_Instruction(this, "LDA", 0xA1, AddressingMode.INDX, 2, 6);
+            instructions[0xB1] = new LDA_Instruction(this, "LDA", 0xB1, AddressingMode.INDY, 2, 5);
+
+            instructions[0xA2] = new LDX_Instruction(this, "LDX", 0xA2, AddressingMode.IMM, 2, 2);
+            instructions[0xAE] = new LDX_Instruction(this, "LDX", 0xAE, AddressingMode.ABS, 3, 4);
+            instructions[0xBE] = new LDX_Instruction(this, "LDX", 0xBE, AddressingMode.ABSY, 3, 4);
+            instructions[0xA6] = new LDX_Instruction(this, "LDX", 0xA6, AddressingMode.ZP, 2, 3);
+            instructions[0xB6] = new LDX_Instruction(this, "LDX", 0xB6, AddressingMode.ZPY, 2, 4);
+
+            instructions[0xA0] = new LDY_Instruction(this, "LDY", 0xA0, AddressingMode.IMM, 2, 2);
+            instructions[0xAC] = new LDY_Instruction(this, "LDY", 0xAC, AddressingMode.ABS, 3, 4);
+            instructions[0xBC] = new LDY_Instruction(this, "LDY", 0xBC, AddressingMode.ABSX , 3, 4);
+            instructions[0xA4] = new LDY_Instruction(this, "LDY", 0xA4, AddressingMode.ZP, 2, 3);
+            instructions[0xB4] = new LDY_Instruction(this, "LDY", 0xB4, AddressingMode.ZPX, 2, 4);
+
+            instructions[0x4A] = new LSR_Instruction(this, "LSR", 0x4A, AddressingMode.Accum, 1, 2);
+            instructions[0x4E] = new LSR_Instruction(this, "LSR", 0x4E, AddressingMode.ABS, 3, 6);
+            instructions[0x5E] = new LSR_Instruction(this, "LSR", 0x5E, AddressingMode.ABSX, 3, 7);
+            instructions[0x46] = new LSR_Instruction(this, "LSR", 0x46, AddressingMode.ZP, 2, 5);
+            instructions[0x56] = new LSR_Instruction(this, "LSR", 0x56, AddressingMode.ZPX, 2, 6);
+
+            instructions[0xEA] = new NOP_Instruction(this, "NOP", 0xEA, AddressingMode.Implied, 1, 2);
+
+            instructions[0x09] = new ORA_Instruction(this, "ORA", 0x09, AddressingMode.IMM, 2, 2);
+            instructions[0x0D] = new ORA_Instruction(this, "ORA", 0x0D, AddressingMode.ABS, 3, 4);
+            instructions[0x1D] = new ORA_Instruction(this, "ORA", 0x1D, AddressingMode.ABSX, 3, 4);
+            instructions[0x19] = new ORA_Instruction(this, "ORA", 0x19, AddressingMode.ABSY, 3, 4);
+            instructions[0x05] = new ORA_Instruction(this, "ORA", 0x05, AddressingMode.ZP, 2, 3);
+            instructions[0x15] = new ORA_Instruction(this, "ORA", 0x15, AddressingMode.ZPX, 2, 4);
+            instructions[0x01] = new ORA_Instruction(this, "ORA", 0x01, AddressingMode.INDX, 2, 6);
+            instructions[0x11] = new ORA_Instruction(this, "ORA", 0x11, AddressingMode.INDY, 2, 5);
+
+            instructions[0x48] = new PHA_Instruction(this, "PHA", 0x48, AddressingMode.Implied, 1, 3);
+
+            instructions[0x08] = new PHP_Instruction(this, "PHP", 0x08, AddressingMode.Implied, 1, 3);
+
+            instructions[0x68] = new PLA_Instruction(this, "PLA", 0x68, AddressingMode.Implied, 1, 4);
+
+            instructions[0x28] = new PLP_Instruction(this, "PLP", 0x28, AddressingMode.Implied, 1, 4);
+
+            instructions[0x2A] = new ROL_Instruction(this, "ROL", 0x2A, AddressingMode.Accum, 1, 2);
+            instructions[0x2E] = new ROL_Instruction(this, "ROL", 0x2E, AddressingMode.ABS, 3, 6);
+            instructions[0x3E] = new ROL_Instruction(this, "ROL", 0x3E, AddressingMode.ABSX, 3, 7);
+            instructions[0x26] = new ROL_Instruction(this, "ROL", 0x26, AddressingMode.ZP, 2, 5);
+            instructions[0x36] = new ROL_Instruction(this, "ROL", 0x36, AddressingMode.ZPX, 2, 6);
+
+            instructions[0x6A] = new ROR_Instruction(this, "ROR", 0x6A, AddressingMode.Accum, 1, 2);
+            instructions[0x6E] = new ROR_Instruction(this, "ROR", 0x6E, AddressingMode.ABS, 3, 6);
+            instructions[0x7E] = new ROR_Instruction(this, "ROR", 0x7E, AddressingMode.ABSX, 3, 7);
+            instructions[0x66] = new ROR_Instruction(this, "ROR", 0x66, AddressingMode.ZP, 2, 5);
+            instructions[0x76] = new ROR_Instruction(this, "ROR", 0x76, AddressingMode.ZPX, 2, 6);
+
+            instructions[0x40] = new RTI_Instruction(this, "RTI", 0x40, AddressingMode.Implied, 1, 6);
+
+            instructions[0x60] = new RTS_Instruction(this, "RTS", 0x60, AddressingMode.Implied, 1, 6);
+
+            instructions[0xE9] = new SBC_Instruction(this, "SBC", 0xE9, AddressingMode.IMM, 2, 2);
+            instructions[0xE9] = new SBC_Instruction(this, "SBC", 0xED, AddressingMode.ABS, 3, 4);
+            instructions[0xE9] = new SBC_Instruction(this, "SBC", 0xFD, AddressingMode.ABSX, 3, 4);
+            instructions[0xE9] = new SBC_Instruction(this, "SBC", 0xF9, AddressingMode.ABSY, 3, 4);
+            instructions[0xE9] = new SBC_Instruction(this, "SBC", 0xE5, AddressingMode.ZP, 2, 3);
+            instructions[0xE9] = new SBC_Instruction(this, "SBC", 0xF5, AddressingMode.ZPX, 2, 4);
+            instructions[0xE9] = new SBC_Instruction(this, "SBC", 0xE1, AddressingMode.INDX, 2, 6);
+            instructions[0xE9] = new SBC_Instruction(this, "SBC", 0xF1, AddressingMode.INDY, 2, 5);
+
+            instructions[0x38] = new SEC_Instruction(this, "SEC", 0x38, AddressingMode.Implied, 1, 2);
+
+            instructions[0xF8] = new SED_Instruction(this, "SED", 0xF8, AddressingMode.Implied, 1, 2);
+
+            instructions[0x78] = new SEI_Instruction(this, "SEI", 0x78, AddressingMode.Implied, 1, 2);
+
+            instructions[0x8D] = new STA_Instruction(this, "STA", 0x8D, AddressingMode.ABS, 3, 4);
+            instructions[0x9D] = new STA_Instruction(this, "STA", 0x9D, AddressingMode.ABSX, 3, 5);
+            instructions[0x99] = new STA_Instruction(this, "STA", 0x99, AddressingMode.ABSY, 3, 5);
+            instructions[0x85] = new STA_Instruction(this, "STA", 0x85, AddressingMode.ZP, 2, 3);
+            instructions[0x95] = new STA_Instruction(this, "STA", 0x95, AddressingMode.ZPX, 2, 4);
+            instructions[0x81] = new STA_Instruction(this, "STA", 0x81, AddressingMode.INDX, 2, 6);
+            instructions[0x91] = new STA_Instruction(this, "STA", 0x91, AddressingMode.INDY, 2, 6);
+
+            instructions[0x8E] = new STX_Instruction(this, "STX", 0x8E, AddressingMode.ABS, 3, 4);
+            instructions[0x86] = new STX_Instruction(this, "STX", 0x86, AddressingMode.ZP, 2, 3);
+            instructions[0x96] = new STX_Instruction(this, "STX", 0x96, AddressingMode.ZPY, 2, 4);
+
+            instructions[0x8C] = new STY_Instruction(this, "STY", 0x8C, AddressingMode.ABS, 3, 4);
+            instructions[0x84] = new STY_Instruction(this, "STY", 0x84, AddressingMode.ZP, 2, 3);
+            instructions[0x94] = new STY_Instruction(this, "STY", 0x94, AddressingMode.ZPX, 2, 4);
+
+            instructions[0xAA] = new TAX_Instruction(this, "TAX", 0xAA, AddressingMode.Implied, 1, 2);
+
+            instructions[0xA8] = new TAY_Instruction(this, "TAY", 0xA8, AddressingMode.Implied, 1, 2);
+
+            instructions[0xBA] = new TSX_Instruction(this, "TSX", 0xBA, AddressingMode.Implied, 1, 2);
+
+            instructions[0x8A] = new TXA_Instruction(this, "TXA", 0x8A, AddressingMode.Implied, 1, 2);
+
+            instructions[0x9A] = new TXS_Instruction(this, "TXS", 0x9A, AddressingMode.Implied, 1, 2);
+
+            instructions[0x98] = new TYA_Instruction(this, "TYA", 0x98, AddressingMode.Implied, 1, 2);
 
         }
 

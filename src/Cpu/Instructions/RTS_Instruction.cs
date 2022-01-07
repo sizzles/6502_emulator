@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 namespace Cpu.Instructions
 {
     [InstructionRegister]
-    public class RTS : Instruction
+    public class RTS_Instruction : Instruction
     {
-        public RTS(Cpu cpu, string mnemonic, byte hexCode, AddressingMode addressingMode, byte instructionBytes, byte machineCycles) : base(cpu, mnemonic, hexCode, addressingMode, instructionBytes, machineCycles)
+        public RTS_Instruction(Cpu cpu, string mnemonic, byte hexCode, AddressingMode addressingMode, byte instructionBytes, byte machineCycles) : base(cpu, mnemonic, hexCode, addressingMode, instructionBytes, machineCycles)
         {
         }
         public override string Description => "loads the program count low and program count high from the stack into the program counter and increments the program counter so that it points to the instruction following the JSR. The stack pointer is adjusted by incrementing it twice.";
