@@ -20,11 +20,11 @@ namespace Cpu.Instructions
 
             bool zeroStatus = cpu.GetProcessorStatusFlag(StatusFlagName.Zero);
 
-            if (zeroStatus == true)
+            if (zeroStatus == false)
             {
                 sbyte signedOp = (sbyte)fr.operand;
                 cpu.SetTimingControl(machineCycles + fr.pageCross + 1);
-                cpu.SetPC((ushort)(cpu.PC + signedOp));
+                cpu.SetPC((ushort)(cpu.PC + signedOp + 1)); //as from the 'next' instruction
             }
             else
             {

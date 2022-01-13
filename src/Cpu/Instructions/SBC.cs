@@ -34,7 +34,7 @@ namespace Cpu.Instructions
 
             byte inverted = (byte)~fr.operand;
 
-            uint result16 = (uint)(cpu.A + inverted + ~carry);
+            uint result16 = (uint)(cpu.A + inverted + carry); //2 for the twos complement representation
 
             //first 8 bits are the result
             byte accumulatorResult = (byte)result16;

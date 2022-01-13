@@ -77,6 +77,9 @@ namespace Cpu
 
     public class Cpu
     {
+
+        public string PC_Hex => PC.ToString("X");
+
         //Registers
         /// <summary>
         /// Accumulator
@@ -115,7 +118,8 @@ namespace Cpu
         //count cycles and finish
 
         public AddressBus addressBus;
-        public Dictionary<Byte, Instruction> instructionMatrix;
+        //public Dictionary<Byte, Instruction> instructionMatrix;
+        public Instruction[] instructions;
 
         //Interrupt Vector Locations
         public const ushort ABORT_VECTOR_LSB = 0XFFF8;
@@ -221,46 +225,47 @@ namespace Cpu
         public Cpu()
         {
             addressBus = new AddressBus();
-            instructionMatrix = new Dictionary<Byte, Instruction>();
-
+            //instructionMatrix = new Dictionary<Byte, Instruction>();
+            instructions = new Instruction[256];
             this.InitInstructionRegister();
             //this.InitProcessorStatusFlags();
             this.PowerUp();
+            //this.Reset();
         }
 
-        private void RegisterInstruction(Instruction instruction)
-        {
-            instructionMatrix[instruction.hexCode] = instruction;
-        }
+        //private void RegisterInstruction(Instruction instruction)
+        //{
+        //    instructionMatrix[instruction.hexCode] = instruction;
+        //}
 
         private void InitInstructionRegister() {
 
-            Assembly info = Assembly.GetExecutingAssembly();
-            var assemblyTypes = info.DefinedTypes;
-            int instructionsRegistered = 0;
+            //Assembly info = Assembly.GetExecutingAssembly();
+            //var assemblyTypes = info.DefinedTypes;
+            //int instructionsRegistered = 0;
 
-            foreach(var type in assemblyTypes)
-            {
-                var customAttributes = type.GetCustomAttributes();
+            //foreach(var type in assemblyTypes)
+            //{
+            //    var customAttributes = type.GetCustomAttributes();
 
-                foreach(var customAttribute in customAttributes)
-                {
-                    if (customAttribute.GetType() == typeof(InstructionRegisterAttribute))
-                    {
-                        Instruction instructionInstance = (Instruction)Activator.CreateInstance(type);
+            //    foreach(var customAttribute in customAttributes)
+            //    {
+            //        if (customAttribute.GetType() == typeof(InstructionRegisterAttribute))
+            //        {
+            //            Instruction instructionInstance = (Instruction)Activator.CreateInstance(type);
 
-                        if (instructionInstance != null) {
-                            instructionsRegistered += 1;
-                            RegisterInstruction(instructionInstance);
-                            Console.WriteLine($"Adding to instruction register: {nameof(instructionInstance)} : {instructionInstance.hexCode}");
-                        }
-                    }
-                }
-            }
+            //            if (instructionInstance != null) {
+            //                instructionsRegistered += 1;
+            //                RegisterInstruction(instructionInstance);
+            //                Console.WriteLine($"Adding to instruction register: {nameof(instructionInstance)} : {instructionInstance.hexCode}");
+            //            }
+            //        }
+            //    }
+            //}
 
-            Console.WriteLine($"Registered {instructionsRegistered} instructions");
+            //Console.WriteLine($"Registered {instructionsRegistered} instructions");
 
-            Instruction[] instructions = new Instruction[256];
+         
 
             //Codes from: https://www.pagetable.com/c64ref/6502/?tab=2#BCS
 
@@ -427,13 +432,13 @@ namespace Cpu
             instructions[0x60] = new RTS_Instruction(this, "RTS", 0x60, AddressingMode.Implied, 1, 6);
 
             instructions[0xE9] = new SBC_Instruction(this, "SBC", 0xE9, AddressingMode.IMM, 2, 2);
-            instructions[0xE9] = new SBC_Instruction(this, "SBC", 0xED, AddressingMode.ABS, 3, 4);
-            instructions[0xE9] = new SBC_Instruction(this, "SBC", 0xFD, AddressingMode.ABSX, 3, 4);
-            instructions[0xE9] = new SBC_Instruction(this, "SBC", 0xF9, AddressingMode.ABSY, 3, 4);
-            instructions[0xE9] = new SBC_Instruction(this, "SBC", 0xE5, AddressingMode.ZP, 2, 3);
-            instructions[0xE9] = new SBC_Instruction(this, "SBC", 0xF5, AddressingMode.ZPX, 2, 4);
-            instructions[0xE9] = new SBC_Instruction(this, "SBC", 0xE1, AddressingMode.INDX, 2, 6);
-            instructions[0xE9] = new SBC_Instruction(this, "SBC", 0xF1, AddressingMode.INDY, 2, 5);
+            instructions[0xED] = new SBC_Instruction(this, "SBC", 0xED, AddressingMode.ABS, 3, 4);
+            instructions[0xFD] = new SBC_Instruction(this, "SBC", 0xFD, AddressingMode.ABSX, 3, 4);
+            instructions[0xF9] = new SBC_Instruction(this, "SBC", 0xF9, AddressingMode.ABSY, 3, 4);
+            instructions[0xE5] = new SBC_Instruction(this, "SBC", 0xE5, AddressingMode.ZP, 2, 3);
+            instructions[0xF5] = new SBC_Instruction(this, "SBC", 0xF5, AddressingMode.ZPX, 2, 4);
+            instructions[0xE1] = new SBC_Instruction(this, "SBC", 0xE1, AddressingMode.INDX, 2, 6);
+            instructions[0xF1] = new SBC_Instruction(this, "SBC", 0xF1, AddressingMode.INDY, 2, 5);
 
             instructions[0x38] = new SEC_Instruction(this, "SEC", 0x38, AddressingMode.Implied, 1, 2);
 
@@ -584,7 +589,7 @@ namespace Cpu
             TimingControl = 0;
 
             //get the instruction
-            Instruction instruction = instructionMatrix[nextInstruction];
+            Instruction instruction = instructions[nextInstruction];
 
             //Execute the instruction
             instruction.Execute(this);

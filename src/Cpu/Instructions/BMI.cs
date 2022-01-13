@@ -24,7 +24,7 @@ namespace Cpu.Instructions
             {
                 sbyte signedOp = (sbyte)fr.operand;
                 cpu.SetTimingControl(machineCycles + fr.pageCross + 1);
-                cpu.SetPC((ushort)(cpu.PC + signedOp));
+                cpu.SetPC((ushort)(cpu.PC + signedOp + 1));
             }
             else
             {
