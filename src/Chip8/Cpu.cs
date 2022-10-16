@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using SDL2;
+using System.Runtime.InteropServices;
 
 namespace Chip8
 {
@@ -36,7 +38,6 @@ namespace Chip8
 
     public class Cpu
     {
-
         Ram ram = new Ram();
         Random random = new Random(0); 
         
@@ -78,16 +79,112 @@ namespace Chip8
 
         public bool[,] display = new bool[displayRows, displayCols]; //rows x columns
         public bool[] keyboard = new bool[16]; //1 = key down, 0 = key up
-        //public byte[,] keyboard = new byte[4, 4] { { 1, 2, 3, 0xC }, { 4, 5, 6, 0xD }, { 7, 8, 9, 0xE }, { 0xA, 0, 0xB, 0xF } };
 
         public ushort insMask = 0b0000000000001111;
 
+        public IntPtr wind = IntPtr.Zero;
+        public IntPtr surf = IntPtr.Zero;
+
+        public int displayScale = 10;
+
+        public object dtLock = new object();
+        public object stLock = new object();
+
+        private SDL.SDL_Event e;
+
+        private byte[,] tile_colours = new byte[2,3] { { 17, 16, 18 }, { 194, 179, 201 } }; //rows x cols bg/fg
+
+        public string romPath = @"C:\tmp\tetris.ch8";
         public Cpu()
         {
+   
+            InitRendering();
             LoadCharSpites();
             LoadRom();
             Reset();
+
+            // called once, to get buffer pointer
+            //keysBuffer = SDL.SDL_GetKeyboardState(out _numkeys);
+
+
+            //Delay Timer
+            new Thread(() =>
+            {
+                while (true)
+
+                {
+                    lock (dtLock)
+                    {
+                        if (dt > 0)
+                        {
+                            dt -= 1;
+                        }
+                    }
+                    Thread.Sleep(16); //sleep roughly at 60hz
+                }
+            }).Start();
+
+            //Sound Timer 
+            new Thread(() =>
+            {
+                while (true)
+                {
+                    bool beep = false;
+                    lock (stLock)
+                    {
+                        if (st > 0)
+                        {
+                            st -= 1;
+                            beep = true;
+                        }
+                    }
+
+                    if (beep)
+                    {
+                        Console.Beep(800, 16);
+                    }
+                    else
+                    {
+                        Thread.Sleep(16); //sleep roughly at 60hz
+                    }
+                    
+                }
+            }).Start();
+
             Tick();
+        }
+
+        public void InitRendering()
+        {
+            SDL.SDL_Init(SDL.SDL_INIT_VIDEO);
+            wind = SDL2.SDL.SDL_CreateWindow("Chip-8 Emulator", 200, 200, displayCols * displayScale, displayRows * displayScale, 0);
+            surf = SDL.SDL_GetWindowSurface(wind);
+        }
+
+        public unsafe void Render()
+        {
+            var rect = new SDL.SDL_Rect();
+            rect.x = 0;
+            rect.y = 0;
+            rect.h = 1 * displayScale;
+            rect.w = 1 * displayScale;
+
+            byte color_row = 0;
+
+            for (int r = 0; r < displayRows; r++)
+            {
+                for (int c =0; c < displayCols; c++)
+                {
+                    color_row = Convert.ToByte(display[r, c]);
+                    
+                    rect.x = c * displayScale;
+                    rect.y = r * displayScale;
+
+                    SDL.SDL_FillRect((System.IntPtr)surf, ref rect, SDL.SDL_MapRGB(((SDL.SDL_Surface*)surf)->format, tile_colours[color_row, 0], tile_colours[color_row, 1], tile_colours[color_row, 2]));
+                }
+            }
+
+            SDL.SDL_UpdateWindowSurface(wind);
         }
 
         public void LoadCharSpites()
@@ -122,13 +219,10 @@ namespace Chip8
                     i++;
                 }
             }
-
-
         }
 
         public void LoadRom()
         {
-            string romPath = "C:\\tmp\\sier.ch8";
             ushort pgmStart = 0x200;
 
             using (FileStream fs = new FileStream(romPath, FileMode.Open))
@@ -165,9 +259,136 @@ namespace Chip8
         {
             return (ushort)((i2 << 8) + (i3 << 4) + i4);
         }
+
         public void Tick()
         {
             while (true) {
+
+                Thread.Sleep(1);
+
+                while(SDL.SDL_PollEvent(out e) != 0)
+                {
+                    //Console.WriteLine($"Event: {e.type}");
+                    if (e.type == SDL.SDL_EventType.SDL_KEYDOWN)
+                    {
+                        //Console.WriteLine($"KEY DOWN: {e.key.keysym.sym}");
+
+                        switch(e.key.keysym.sym)
+                        {
+                            case SDL.SDL_Keycode.SDLK_1:
+                                keyboard[1] = true;
+                                break;
+                            case SDL.SDL_Keycode.SDLK_2:
+                                keyboard[2] = true;
+                                break;
+                            case SDL.SDL_Keycode.SDLK_3:
+                                keyboard[3] = true;
+                                break;
+                            case SDL.SDL_Keycode.SDLK_4:
+                                keyboard[12] = true;
+                                break;
+                            case SDL.SDL_Keycode.SDLK_q:
+                                keyboard[4] = true;
+                                break;
+                            case SDL.SDL_Keycode.SDLK_w:
+                                keyboard[5] = true;
+                                break;
+                            case SDL.SDL_Keycode.SDLK_e:
+                                keyboard[6] = true;
+                                break;
+                            case SDL.SDL_Keycode.SDLK_r:
+                                keyboard[13] = true;
+                                break;
+                            case SDL.SDL_Keycode.SDLK_a:
+                                keyboard[7] = true;
+                                break;
+                            case SDL.SDL_Keycode.SDLK_s:
+                                keyboard[8] = true;
+                                break;
+                            case SDL.SDL_Keycode.SDLK_d:
+                                keyboard[9] = true;
+                                break;
+                            case SDL.SDL_Keycode.SDLK_f:
+                                keyboard[14] = true;
+                                break;
+                            case SDL.SDL_Keycode.SDLK_z:
+                                keyboard[10] = true;
+                                break;
+                            case SDL.SDL_Keycode.SDLK_x:
+                                keyboard[0] = true;
+                                break;
+                            case SDL.SDL_Keycode.SDLK_c:
+                                keyboard[11] = true;
+                                break;
+                            case SDL.SDL_Keycode.SDLK_v:
+                                keyboard[15] = true;
+                                break;
+
+                            default:
+                                break;
+                        }
+                    }
+
+                    else if (e.type == SDL.SDL_EventType.SDL_KEYUP)
+                    {
+                        //Console.WriteLine($"KEY UP: {e.key.keysym.sym}");
+
+                        switch (e.key.keysym.sym)
+                        {
+                            case SDL.SDL_Keycode.SDLK_1:
+                                keyboard[1] = false;
+                                break;
+                            case SDL.SDL_Keycode.SDLK_2:
+                                keyboard[2] = false;
+                                break;
+                            case SDL.SDL_Keycode.SDLK_3:
+                                keyboard[3] = false;
+                                break;
+                            case SDL.SDL_Keycode.SDLK_4:
+                                keyboard[0xc] = false;
+                                break;
+                            case SDL.SDL_Keycode.SDLK_q:
+                                keyboard[4] = false;
+                                break;
+                            case SDL.SDL_Keycode.SDLK_w:
+                                keyboard[5] = false;
+                                break;
+                            case SDL.SDL_Keycode.SDLK_e:
+                                keyboard[6] = false;
+                                break;
+                            case SDL.SDL_Keycode.SDLK_r:
+                                keyboard[0xd] = false;
+                                break;
+                            case SDL.SDL_Keycode.SDLK_a:
+                                keyboard[7] = false;
+                                break;
+                            case SDL.SDL_Keycode.SDLK_s:
+                                keyboard[8] = false;
+                                break;
+                            case SDL.SDL_Keycode.SDLK_d:
+                                keyboard[9] = false;
+                                break;
+                            case SDL.SDL_Keycode.SDLK_f:
+                                keyboard[0xe] = false;
+                                break;
+                            case SDL.SDL_Keycode.SDLK_z:
+                                keyboard[0xa] = false;
+                                break;
+                            case SDL.SDL_Keycode.SDLK_x:
+                                keyboard[0] = false;
+                                break;
+                            case SDL.SDL_Keycode.SDLK_c:
+                                keyboard[0xb] = false;
+                                break;
+                            case SDL.SDL_Keycode.SDLK_v:
+                                keyboard[0xf] = false;
+                                break;
+
+                            default:
+                                break;
+                        }
+                    }
+                }
 
                 //instructions most significant byte first -- made of two instructions
                 byte msb = ram[this.pc];
@@ -184,11 +405,11 @@ namespace Chip8
                 //N, NN, NNN = literal numbers
 
                 //have to use bytes as we dont have a nibble natively in c#
-                //
+
 
                 byte c = Convert.ToByte(ins >> 12);
                 byte i2 = (byte)((ins >> 8) & insMask);
-                
+
                 byte i3 = (byte)((ins >> 4) & insMask);
                 byte i4 = (byte)(ins & insMask);
 
@@ -307,7 +528,8 @@ namespace Chip8
                     }
                     else if (i4 == 0xE) //SHL Vx {, Vy} - Set Vx = Vx SHL 1.
                     {
-                        if (((registers[x] & 0b10000000) >> 7) == 1)
+                        //if (((registers[x] & 0b10000000) >> 7) == 1)
+                        if ((registers[x] >> 7) == 1)
                         {
                             registers[0xf] = 1;
                         }
@@ -315,7 +537,7 @@ namespace Chip8
                         {
                             registers[0xf] = 0;
                         }
-                        registers[x] = (byte)(registers[x] << 2); //multiply by 2
+                        registers[x] = (byte)(registers[x] << 1); //multiply by 2
                     }
                 }
                 else if (c == 9) //SNE Vx, Vy Skip next instruction if Vx != Vy.
@@ -355,8 +577,6 @@ namespace Chip8
 
                     //Wrap around to both the top and side to side of the sprite
                     //check for the overlaps? - I guess cant set anything to minus 1 so only ahve to worry about 2 directions of overlap
-
-                    int spriteRows = bytesToRead;
                     //render the sprite to the string
                     //x = cols, y = rows
                     byte flippedBit = 0;
@@ -375,14 +595,8 @@ namespace Chip8
 
                             //going through each pixel in the row
 
-                            //63 -
-
                             var colOverlap = registers[x] + p;
                             var rowOverlap = registers[y] + i;
-
-
-                            //var colOverlap = 63 - (registers[x] + p); //eg 63 - 63 + 0; //draw pixel on las tline
-                            //var rowOverlap = 31 - (registers[y] + i); //gives us the final position
 
                             //if we have gone out of bounds then just continue - nothing is done
 
@@ -410,28 +624,7 @@ namespace Chip8
                     }
 
                     registers[0xf] = flippedBit;
-
-                    //draw the display
-                    for (int r = 0; r < 32; r++)
-                    {
-                        string d = "";
-                        for (int column  = 0; column < 64; column++)
-                        {
-                            if (Convert.ToInt32(display[r, column]) == 1)
-                            {
-                                d += "x";
-                            }
-
-                            else
-                            {
-                                d += " ";
-                            }
-                        }
-
-                        Console.WriteLine(d);
-
-                    }
-                    Console.WriteLine("||||||||||||||||||||||||||||||||||||||||");
+                    Render();
                 }
                 else if (c == 0xE)
                 {
@@ -461,6 +654,109 @@ namespace Chip8
                     {
                         //wait for a keypress ?
                         //todo
+                        bool break_flag = false;
+                        byte key_pressed = 0;
+
+                        while (break_flag == false)
+                        {
+                            Thread.Sleep(1);
+                            while (SDL.SDL_PollEvent(out e) != 0)
+                            {
+                                if (e.type == SDL.SDL_EventType.SDL_KEYDOWN)
+                                {
+                                    switch (e.key.keysym.sym)
+                                    {
+                                        case SDL.SDL_Keycode.SDLK_1:
+                                            keyboard[1] = true;
+                                            break_flag = true;
+                                            key_pressed = 1;
+                                            break;
+                                        case SDL.SDL_Keycode.SDLK_2:
+                                            keyboard[2] = true;
+                                            break_flag = true;
+                                            key_pressed = 2;
+                                            break;
+                                        case SDL.SDL_Keycode.SDLK_3:
+                                            keyboard[3] = true;
+                                            break_flag = true;
+                                            key_pressed = 3;
+                                            break;
+                                        case SDL.SDL_Keycode.SDLK_4:
+                                            keyboard[0xc] = true;
+                                            break_flag = true;
+                                            key_pressed = 0xc;
+                                            break;
+                                        case SDL.SDL_Keycode.SDLK_q:
+                                            keyboard[4] = true;
+                                            break_flag = true;
+                                            key_pressed = 4;
+                                            break;
+                                        case SDL.SDL_Keycode.SDLK_w:
+                                            keyboard[5] = true;
+                                            break_flag = true;
+                                            key_pressed = 5;
+                                            break;
+                                        case SDL.SDL_Keycode.SDLK_e:
+                                            keyboard[6] = true;
+                                            break_flag = true;
+                                            key_pressed = 6;
+                                            break;
+                                        case SDL.SDL_Keycode.SDLK_r:
+                                            keyboard[0xd] = true;
+                                            break_flag = true;
+                                            key_pressed = 0xd;
+                                            break;
+                                        case SDL.SDL_Keycode.SDLK_a:
+                                            keyboard[7] = true;
+                                            break_flag = true;
+                                            key_pressed = 7;
+                                            break;
+                                        case SDL.SDL_Keycode.SDLK_s:
+                                            keyboard[8] = true;
+                                            break_flag = true;
+                                            key_pressed = 8;
+                                            break;
+                                        case SDL.SDL_Keycode.SDLK_d:
+                                            keyboard[9] = true;
+                                            break_flag = true;
+                                            key_pressed = 9;
+                                            break;
+                                        case SDL.SDL_Keycode.SDLK_f:
+                                            keyboard[0xe] = true;
+                                            break_flag = true;
+                                            key_pressed = 0xe;
+                                            break;
+                                        case SDL.SDL_Keycode.SDLK_z:
+                                            keyboard[0xa] = true;
+                                            break_flag = true;
+                                            key_pressed = 0xa;
+                                            break;
+                                        case SDL.SDL_Keycode.SDLK_x:
+                                            keyboard[0] = true;
+                                            break_flag = true;
+                                            key_pressed = 0;
+                                            break;
+                                        case SDL.SDL_Keycode.SDLK_c:
+                                            keyboard[0xb] = true;
+                                            break_flag = true;
+                                            key_pressed = 0xb;
+                                            break;
+                                        case SDL.SDL_Keycode.SDLK_v:
+                                            keyboard[0xf] = true;
+                                            break_flag = true;
+                                            key_pressed = 0xf;
+                                            break;
+
+                                        default:
+                                            break;
+                                    }
+                                }
+                            }
+
+
+                        }
+
+                        registers[x] = (byte)key_pressed;
                     }
                     else if (i3 == 1 && i4 == 5) //Fx15 - LD DT, Vx
                     {
@@ -478,6 +774,9 @@ namespace Chip8
                     else if (i3 == 2 && i4 == 9)
                     {
                         //get sprite mapping todo
+                        byte digit = registers[x];
+
+                        I = (ushort)(digit * 5); //they are 5 bytes long each and we star at 0
                     }
                     else if (i3 == 3 && i4 == 3)
                     {
@@ -496,23 +795,20 @@ namespace Chip8
                     else if (i3 == 5 && i4 == 5)
                     {
                         //store registers in memory - starting at I
-                        for (int i = 0; i < registers.Length; i++)
+                        for (int i = 0; i <= x; i++)
                         {
                             ram[(ushort)(I + i)] = registers[i];
                         }
                     }
                     else if (i3 == 6 && i4 == 5) //Fx65 - LD Vx, [I]
                     {
-                        for (int i = 0; i < registers.Length; i++)
+                        for (int i = 0; i <= x; i++)
                         {
                             registers[i] = ram[(ushort)(I + i)];
                         }
                     }
                 }
-
-
             }
-
         }
     }
 }
